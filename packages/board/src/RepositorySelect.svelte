@@ -44,6 +44,8 @@
 
   $: selectedHint = mouseSelectedHint || keyboardSelectedHint;
 
+  $: console.log(selectedHint);
+
   function computeMatch(search, repositories) {
 
     console.log(repositories);
@@ -166,9 +168,7 @@
 
   function checkClose(event) {
 
-    const { key } = event;
-
-    if (key === 'Escape') {
+    if (event.key === 'Escape') {
       event.preventDefault();
 
       onClose();
@@ -181,16 +181,32 @@
     }
   }
 
-  function checkSubmit(event) {
 
+  function checkSubmit(event) {
     event.preventDefault();
 
-    fetch('/wuffle/board/new_issue_endpoint')
-    var win = window.open(url, '_blank');
+    if (!value) {
+      return;
+    }
+
+    const [ owner, repo ] = value.split('/');
+
+    if (!repo || !owner) {
+      return;
+    }
+
+    fetch('/wuffle/board/new_issue_endpoint', {
+      body: {
+        repo,
+        owner
+      }
+    }).then(function(url) {
+      return window.open(url, '_blank');
+    });
   }
 
   function checkRepo() {
-
+    debugger;
   }
 
 </script>
@@ -243,16 +259,18 @@
 
   <form class="form-inline issue-creator" on:submit={ checkSubmit }>
     <div class="input-prefixed input-prefixed-lg">
+
       <label class="prefix" for={ inputId }>
         <svg height="1em" viewBox="0 0 12 16" version="1.1" aria-hidden="true"><path fill-rule="evenodd" d="M4 9H3V8h1v1zm0-3H3v1h1V6zm0-2H3v1h1V4zm0-2H3v1h1V2zm8-1v12c0 .55-.45 1-1 1H6v2l-1.5-1.5L3 16v-2H1c-.55 0-1-.45-1-1V1c0-.55.45-1 1-1h10c.55 0 1 .45 1 1zm-1 10H1v2h2v-1h3v1h5v-2zm0-10H2v9h9V1z"></path></svg>
       </label>
+
       <input
         id={ inputId }
         bind:this={input}
         value={ value }
         on:input={ handleInput }
         on:keydown={ handleInputKey }
-        placeholder="Enter repository name"
+        placeholder="Enter org/repository name"
         autocomplete="off"
         spellcheck="false"
         aria-label="Repository name input"

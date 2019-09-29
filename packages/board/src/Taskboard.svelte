@@ -8,7 +8,7 @@
 
   import Card from './Card.svelte';
 
-  import RepositorySelect from './RepositorySelect.svelte';
+  import CreateIssue from './CreateIssue.svelte';
 
   import Api from './Api';
 
@@ -24,10 +24,6 @@
     periodic,
     throttle
   } from './util';
-
-  import {
-    isNewIssueShortcut
-  } from './shortcuts';
 
   import loaderImage from './loader.png';
 
@@ -61,8 +57,6 @@
   let filter = parseSearchFilter();
   let user = null;
   let cursor = null;
-
-  let showCreateIssue = false;
 
   let accessNotification = false;
 
@@ -589,14 +583,6 @@
     }, 5);
   }
 
-  function handleGlobalKey(event) {
-
-    if (user && isNewIssueShortcut(event)) {
-      showCreateIssue = true;
-
-      event.preventDefault();
-    }
-  }
 </script>
 
 <style lang="scss">
@@ -647,19 +633,14 @@
   {/if}
 </svelte:head>
 
-<svelte:window on:keydown={ handleGlobalKey } />
-
 <div class="taskboard">
 
   <Loader shown={ loading }>
     <img src={ loaderImage } width="64" alt="Loading" />
   </Loader>
 
-  {#if showCreateIssue}
-    <RepositorySelect
-      repositories={ filterOptions['repo'] }
-      onClose={ () => showCreateIssue = false }
-    />
+  {#if user}
+    <CreateIssue repositories={ filterOptions['repo'] } />
   {/if}
 
   {#if error}
